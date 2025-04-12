@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  go-app:
+    build:
+      context: .
+    volumes:
+      - .:/app  # Mount local project directory into `/app` in the container
+    ports:
+      - "8080:8080"  # Expose ports if needed
+    stdin_open: true  # Keep stdin open for interactive sessions
+    tty: true         # Allocate a pseudo-TTY for SSH-like access
