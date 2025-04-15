@@ -53,6 +53,7 @@ type TaskStorage interface {
 	Add(task *Task) error
 	Delete(id uint32) error
 	Update(id uint32, title string, status TaskStatus) error
+	GetAll() ([]*Task, error)
 }
 
 type LocalStorage struct {
@@ -71,6 +72,19 @@ func (storage *LocalStorage) Get(id uint32) (*Task, error) {
 	}
 
 	return pTask, nil
+}
+
+func (storage *LocalStorage) GetAll() ([]*Task, error) {
+	storage.mu.RLock()
+	defer storage.mu.RUnlock()
+
+	tasks := make([]*Task, 0, len(storage.tasks))
+
+	for _, task := range storage.tasks {
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
 }
 
 func (storage *LocalStorage) Add(task *Task) error {
@@ -193,4 +207,13 @@ func (m *Manager) UpdateTask(id uint32, title string, status TaskStatus) error {
 	}
 
 	return nil
+}
+
+func (m *Manager) GetAllTasks() ([]*Task, error) {
+	tasks, err := m.Storage.GetAll()
+	if err != nil {
+		return tasks, fmt.Errorf("Error getting all tasks: %v\n", err)
+	}
+
+	return tasks, nil
 }
